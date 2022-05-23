@@ -43,7 +43,8 @@ using lcd_t = st7789<LCD_WIDTH,
 
 
 #define PIN_NUM_BUTTON 0
-#define TIMEOUT_SECS 5
+#define TIMEOUT_SECS 10
+
 lcd_t lcd;
 uint32_t timeout_ts;
 int timeout_hit;
@@ -62,15 +63,20 @@ void loop() {
  if(button!=old_button) {
    old_button = button;
     if(button==HIGH) {
-      ++timeout_hit;
-      timout_ts = millis();
+      timeout_hit+=TIMEOUT_SECS;
+      timeout_ts = millis();
       Serial.println("Button");
     }
  } 
- if(millis()-timeout_ts>(TIMEOUT_SECS*1000)) {
+ if(millis()-timeout_ts>1000) {
    timeout_ts=millis();
-   if(timeout_hit>0 && !--timeout_hit) {
-     Serial.println("Timeout");
-   }
+   if(timeout_hit>0) {
+     Serial.println(timeout_hit);
+     --timeout_hit;
+     if(timeout_hit==0) {
+      Serial.println("Timeout");
+    }
+   } 
+   
  }
 }
